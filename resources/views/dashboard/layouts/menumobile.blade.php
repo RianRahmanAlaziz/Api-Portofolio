@@ -23,38 +23,32 @@
             <li>
                 <a href="javascript:;" class="menu">
                     <div class="menu__icon"> <i data-lucide="layers"></i> </div>
-                    <div class="menu__title"> Menu Home <i data-lucide="chevron-down" class="menu__sub-icon "></i>
+                    <div class="menu__title"> Home <i data-lucide="chevron-down" class="menu__sub-icon "></i>
                     </div>
                 </a>
                 <ul class="">
                     <li>
-                        <a href="/dashboard/info" class="menu">
-                            <div class="menu__icon"> <i data-lucide="file-text"></i> </div>
-                            <div class="menu__title"> Info</div>
+                        <a href="/dashboard/home" class="menu">
+                            <div class="menu__icon"> <i data-lucide="activity"></i> </div>
+                            <div class="menu__title"> Home</div>
                         </a>
                     </li>
                     <li>
-                        <a href="/dashboard/clients" class="menu">
-                            <div class="menu__icon"> <i data-lucide="monitor"></i> </div>
-                            <div class="menu__title"> Client</div>
+                        <a href="/dashboard/aboutme" class="menu">
+                            <div class="menu__icon"> <i data-lucide="activity"></i> </div>
+                            <div class="menu__title"> About</div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/dashboard/myproject" class="menu">
+                            <div class="menu__icon"> <i data-lucide="activity"></i> </div>
+                            <div class="menu__title">My Project</div>
                         </a>
                     </li>
                     <li>
                         <a href="/dashboard/contact" class="menu">
-                            <div class="menu__icon"> <i data-lucide="phone-call"></i> </div>
+                            <div class="menu__icon"> <i data-lucide="activity"></i> </div>
                             <div class="menu__title"> Contact</div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/dashboard/whychoose" class="menu">
-                            <div class="menu__icon"> <i data-lucide="book"></i> </div>
-                            <div class="menu__title"> Why Choose</div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/dashboard/aboutus" class="menu">
-                            <div class="menu__icon"> <i data-lucide="home"></i> </div>
-                            <div class="menu__title">About Us</div>
                         </a>
                     </li>
                 </ul>
