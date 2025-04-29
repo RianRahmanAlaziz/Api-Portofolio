@@ -9,6 +9,7 @@ use \Cviebrock\EloquentSluggable\Services\SlugService;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class ProjectController extends Controller
 {
@@ -80,15 +81,11 @@ class ProjectController extends Controller
         $status = $request->has('status') ? 'Active' : 'Inactive';
         $validatedData['status'] = $status;
         $title = Str::slug($request->title);
-        // Cek apakah folder ada, jika tidak ada buat folder
-        $folderPath = public_path('assets\images\project');
-        if (!File::exists($folderPath)) {
-            File::makeDirectory($folderPath, 0777, true); // Membuat folder dengan izin 0777
-        }
+
+        $folderPath = 'project';
         // Mulai transaksi database
         DB::beginTransaction();
         try {
-
             // Array untuk menyimpan nama gambar
             $imagePaths = [];
             // Loop untuk menyimpan setiap file gambar yang di-upload
@@ -96,7 +93,7 @@ class ProjectController extends Controller
                 // Buat nama gambar unik (misalnya tambahkan index atau timestamp agar tidak bentrok)
                 $nama_gambar = $title . '-' . $index . '.' . $file->getClientOriginalExtension();
                 // Pindahkan file ke folder yang sudah dibuat
-                $file->move($folderPath, $nama_gambar);
+                $file->storeAs('public/' . $folderPath, $nama_gambar);
                 // Simpan nama gambar ke array
                 $imagePaths[] = $nama_gambar;
             }
@@ -107,7 +104,7 @@ class ProjectController extends Controller
             if ($request->hasFile('thumbnail')) {
                 $thumbnailFile = $request->file('thumbnail');
                 $thumbnailName = $title . '-thumbnail.' . $thumbnailFile->getClientOriginalExtension();
-                $thumbnailFile->move($folderPath, $thumbnailName);
+                $thumbnailFile->storeAs('public/' . $folderPath, $thumbnailName);
                 $validatedData['thumbnail'] = $thumbnailName;
             }
             $validatedData['tech'] = json_encode($request->tech);
@@ -131,9 +128,7 @@ class ProjectController extends Controller
             DB::rollBack();
             // Hapus file yang sudah diupload jika terjadi error
             foreach ($imagePaths as $gambar) {
-                if (file_exists(public_path('assets/images/project/' . $gambar))) {
-                    unlink(public_path('assets/images/project/' . $gambar));
-                }
+                Storage::delete('public/' . $folderPath . '/' . $gambar);
             }
             // Kembali ke halaman sebelumnya dengan pesan error
             return redirect()

@@ -46,7 +46,7 @@
                                             class="w-10 h-10 image-fit zoom-in @if (!$loop->first) -ml-5 @endif">
                                             <img alt="{{ $item->title }}" data-action="zoom"
                                                 class="w-full tooltip rounded-full"
-                                                src="{{ asset('assets/images/project/' . $gambar) }}"
+                                                src="{{ asset('storage/project/' . $gambar) }}"
                                                 title="Uploaded at {{ $item->updated_at->format('d F Y') }}">
                                         </div>
                                     @endforeach
@@ -57,7 +57,7 @@
                                     <div class="w-10 h-10 image-fit zoom-in ">
                                         <img alt="{{ $item->title }}" data-action="zoom"
                                             class="w-full tooltip rounded-full"
-                                            src="{{ asset('assets/images/project/' . $item->thumbnail) }}"
+                                            src="{{ asset('storage/project/' . $item->thumbnail) }}"
                                             title="Uploaded at {{ $item->updated_at->format('d F Y') }}">
                                     </div>
                                 </div>
