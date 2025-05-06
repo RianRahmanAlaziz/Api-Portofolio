@@ -1,10 +1,13 @@
 <?php
 
+use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AboutmeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EducationController;
+use App\Http\Controllers\ExperienceController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MyprojectController;
 use App\Http\Controllers\ProjectController;
@@ -38,4 +41,7 @@ Route::middleware(['auth'])->prefix('dashboard')->group(function () {
 
     Route::resource('/project', ProjectController::class);
     Route::resource('/category', CategoryController::class);
+    Route::resource('/about', AboutController::class);
+    Route::resource('/education', EducationController::class);
+    Route::resource('/experience', ExperienceController::class);
 });

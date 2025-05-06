@@ -33,7 +33,7 @@
                                             </div>
                                         </div>
                                         <div class="w-32 mt-3 xl:mt-0 flex-1">
-                                            <textarea name="description" id="description" rows="5" class="editor">{{ old('description', $myproject->description) }}</textarea>
+                                            <textarea name="description" id="description" rows="5" class="form-control">{{ old('description', $myproject->description) }}</textarea>
                                             @error('description')
                                                 <div class="text-danger form-help text-left">
                                                     {{ $message }}

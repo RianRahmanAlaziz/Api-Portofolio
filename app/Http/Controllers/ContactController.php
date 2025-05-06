@@ -9,6 +9,11 @@ use Spatie\LaravelImageOptimizer\Facades\ImageOptimizer;
 
 class ContactController extends Controller
 {
+    public function api()
+    {
+        $Contact = Contact::firstOrFail();
+        return response()->json($Contact);
+    }
     /**
      * Display a listing of the resource.
      */

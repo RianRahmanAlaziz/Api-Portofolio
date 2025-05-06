@@ -10,6 +10,11 @@ use Spatie\LaravelImageOptimizer\Facades\ImageOptimizer;
 
 class HomeController extends Controller
 {
+    public function api()
+    {
+        $home = Home::firstOrFail();
+        return response()->json($home);
+    }
     /**
      * Display a listing of the resource.
      */
@@ -32,8 +37,9 @@ class HomeController extends Controller
             'title' => 'required',
             'cv' => 'nullable|mimes:pdf',
             'description' => 'required',
+            'gambar' => 'nullable',
+            'cv' => 'nullable',
         ]);
-
         try {
             if ($request->hasFile('gambar')) {
                 File::delete('assets/images/' . $home->gambar);
@@ -57,22 +63,18 @@ class HomeController extends Controller
             }
 
             if ($request->has('cv')) {
-                File::delete('assets/pdf/' . $home->gambar);
-
+                File::delete('assets/pdf/' . $home->cv);
                 $file = $request->file('cv');
-
                 $nama_file = 'CV' . '.' . $file->getClientOriginalExtension();
                 $file->move('assets/pdf', $nama_file);
                 $validatedData['cv'] = $nama_file;
             } else {
                 // Jika tidak ada gambar baru, ganti nama gambar lama mengikuti title baru
-                $oldImageName = $home->gambar;
-                $extension = pathinfo($oldImageName, PATHINFO_EXTENSION); // Ambil ekstensi gambar lama
+                $oldFileName = $home->cv;
+                $extension = pathinfo($oldFileName, PATHINFO_EXTENSION); // Ambil ekstensi gambar lama
                 $nama_file = 'CV' . '.' . $extension; // Nama gambar baru sesuai title
-
                 // Pindahkan gambar lama ke nama baru
-                File::move('assets/pdf/' . $oldImageName, 'assets/pdf/' . $nama_file);
-
+                File::move('assets/pdf/' . $oldFileName, 'assets/pdf/' . $nama_file);
                 // Simpan nama gambar baru di validatedData
                 $validatedData['cv'] = $nama_file;
             }

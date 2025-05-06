@@ -16,8 +16,8 @@
         <li class="side-nav__devider my-6"></li>
         <li>
             <a href="javascript:;"
-                class="side-menu {{ Request::is('dashboard/home*', 'dashboard/about*', 'dashboard/contact*', 'dashboard/myproject*') ? 'side-menu--active' : '' }}">
-                <div class="side-menu__icon"> <i data-lucide="layers"></i> </div>
+                class="side-menu {{ Request::is('dashboard/home*', 'dashboard/aboutme*', 'dashboard/contact*', 'dashboard/myproject*') ? 'side-menu--active' : '' }}">
+                <div class="side-menu__icon"> <i data-lucide="layout"></i> </div>
                 <div class="side-menu__title">
                     Menu
                     <div
@@ -60,10 +60,10 @@
             </ul>
         </li>
         <li>
-            <a href="/dashboard/project"
-                class="side-menu {{ Request::is('dashboard/project*') ? 'side-menu--active' : '' }}">
-                <div class="side-menu__icon"> <i data-lucide="folder"></i> </div>
-                <div class="side-menu__title"> Projects </div>
+            <a href="/dashboard/about"
+                class="side-menu {{ Request::is('dashboard/about') ? 'side-menu--active' : '' }}">
+                <div class="side-menu__icon"> <i data-lucide="command"></i> </div>
+                <div class="side-menu__title"> About </div>
             </a>
         </li>
         <li>
@@ -73,6 +73,30 @@
                 <div class="side-menu__title"> Category </div>
             </a>
         </li>
+        <li>
+            <a href="/dashboard/education"
+                class="side-menu {{ Request::is('dashboard/education*') ? 'side-menu--active' : '' }}">
+                <div class="side-menu__icon"> <i data-lucide="slack"></i> </div>
+                <div class="side-menu__title"> Education </div>
+            </a>
+        </li>
+        <li>
+            <a href="/dashboard/experience"
+                class="side-menu {{ Request::is('dashboard/experience*') ? 'side-menu--active' : '' }}">
+                <div class="side-menu__icon"> <i data-lucide="briefcase"></i> </div>
+                <div class="side-menu__title"> Experience </div>
+            </a>
+        </li>
+        <li>
+            <a href="/dashboard/project"
+                class="side-menu {{ Request::is('dashboard/project*') ? 'side-menu--active' : '' }}">
+                <div class="side-menu__icon"> <i data-lucide="folder"></i> </div>
+                <div class="side-menu__title"> Projects </div>
+            </a>
+        </li>
+
+
+
 
         <li class="side-nav__devider my-6"></li>
     </ul>

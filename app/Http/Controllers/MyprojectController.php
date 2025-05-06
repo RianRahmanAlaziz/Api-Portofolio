@@ -9,6 +9,11 @@ use Spatie\LaravelImageOptimizer\Facades\ImageOptimizer;
 
 class MyprojectController extends Controller
 {
+    public function api()
+    {
+        $Myproject = Myproject::firstOrFail();
+        return response()->json($Myproject);
+    }
     /**
      * Display a listing of the resource.
      */

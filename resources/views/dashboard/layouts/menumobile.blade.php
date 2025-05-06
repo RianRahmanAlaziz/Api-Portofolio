@@ -22,7 +22,7 @@
             <li class="menu__devider my-3"></li>
             <li>
                 <a href="javascript:;" class="menu">
-                    <div class="menu__icon"> <i data-lucide="layers"></i> </div>
+                    <div class="menu__icon"> <i data-lucide="layout"></i> </div>
                     <div class="menu__title"> Home <i data-lucide="chevron-down" class="menu__sub-icon "></i>
                     </div>
                 </a>
@@ -54,9 +54,9 @@
                 </ul>
             </li>
             <li>
-                <a href="/dashboard/product" class="menu">
-                    <div class="menu__icon"> <i data-lucide="shopping-cart"></i> </div>
-                    <div class="menu__title"> Product </div>
+                <a href="/dashboard/about" class="menu">
+                    <div class="menu__icon"> <i data-lucide="command"></i> </div>
+                    <div class="menu__title"> About </div>
                 </a>
             </li>
             <li>
@@ -66,9 +66,21 @@
                 </a>
             </li>
             <li>
-                <a href="/dashboard/file-manager" class="menu">
+                <a href="/dashboard/education" class="menu">
+                    <div class="menu__icon"> <i data-lucide="slack"></i> </div>
+                    <div class="menu__title"> Education </div>
+                </a>
+            </li>
+            <li>
+                <a href="/dashboard/experience" class="menu">
+                    <div class="menu__icon"> <i data-lucide="briefcase"></i> </div>
+                    <div class="menu__title"> Experience </div>
+                </a>
+            </li>
+            <li>
+                <a href="/dashboard/project" class="menu">
                     <div class="menu__icon"> <i data-lucide="folder"></i> </div>
-                    <div class="menu__title"> File Manager </div>
+                    <div class="menu__title"> Projects </div>
                 </a>
             </li>
 

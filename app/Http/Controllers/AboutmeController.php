@@ -9,6 +9,11 @@ use Spatie\LaravelImageOptimizer\Facades\ImageOptimizer;
 
 class AboutmeController extends Controller
 {
+    public function api()
+    {
+        $Aboutme = Aboutme::firstOrFail();
+        return response()->json($Aboutme);
+    }
     /**
      * Display a listing of the resource.
      */

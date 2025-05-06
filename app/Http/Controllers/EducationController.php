@@ -2,48 +2,38 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
-use App\Models\Project;
+use App\Models\Education;
 use Illuminate\Http\Request;
-use \Cviebrock\EloquentSluggable\Services\SlugService;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
-class ProjectController extends Controller
+class EducationController extends Controller
 {
+    public function api()
+    {
+        $Education = Education::all();
+
+        return response()->json($Education);
+    }
     /**
      * Display a listing of the resource.
      */
-    public function api()
-    {
-        $projects = Project::all();
-        $projects = $projects->map(function ($project) {
-            $project->tech = json_decode($project->tech, true);  // Decode JSON ke array
-            $project->gambar = json_decode($project->gambar, true);  // Decode JSON ke array
-            return $project;
-        });
-
-        return response()->json($projects);
-    }
-
-
-
     public function index(Request $request)
     {
-        $query = Project::query();
+        $query = Education::query();
 
         // Filter berdasarkan pencarian
         if ($request->has('search')) {
             $search = $request->input('search');
             $query->where('title', 'like', "%{$search}%");
         }
-        $project = $query->paginate(10);
+        $education = $query->paginate(10);
 
-        return view('dashboard.projects.index', [
-            'title' => 'Dashboard',
-            'project' => $project->appends([
+        return view('dashboard.education.education', [
+            'title' => 'Education Page',
+            'education' => $education->appends([
                 'search' => $request->input('search'),
             ]),
         ]);
@@ -54,9 +44,8 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        return view('dashboard.projects.add', [
-            'title' => 'Add Project',
-            'category' => Category::all()
+        return view('dashboard.education.add', [
+            'title' => 'Add Education',
         ]);
     }
 
@@ -66,23 +55,16 @@ class ProjectController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'title' => 'required',
-            'slug' => 'required|unique:projects',
-            'category_id' => 'required',
-            'tech' => 'required|array', // Pastikan  berupa array
-            'gambar' => 'required|array', // Pastikan gambar berupa array
+            'univ' => 'required',
+            'jurusan' => 'required',
+            'from' => 'required', // Pastikan  berupa array
+            'to' => 'required',
+            'gambar' => 'nullable|array', // Pastikan gambar berupa array
             'gambar.*' => 'image|mimes:jpg,jpeg,png,gif|max:5048', // Validasi untuk setiap file
-            'thumbnail' => 'image|mimes:jpg,jpeg,png,gif|max:5048',
-            'desc' => 'nullable',
-            'year' => 'required',
-            'preview' => 'nullable',
-            'code' => 'nullable',
         ]);
-        $status = $request->has('status') ? 'Active' : 'Inactive';
-        $validatedData['status'] = $status;
-        $title = Str::slug($request->title);
 
-        $folderPath = 'project';
+        $univ = Str::slug($request->univ);
+
         // Mulai transaksi database
         DB::beginTransaction();
         try {
@@ -91,26 +73,17 @@ class ProjectController extends Controller
             // Loop untuk menyimpan setiap file gambar yang di-upload
             foreach ($request->file('gambar') as $index => $file) {
                 // Buat nama gambar unik (misalnya tambahkan index atau timestamp agar tidak bentrok)
-                $nama_gambar = $title . '-' . $index . '.' . $file->getClientOriginalExtension();
+                $nama_gambar = $univ . '-' . $index . '.' . $file->getClientOriginalExtension();
                 // Pindahkan file ke folder yang sudah dibuat
-                $file->storeAs('public/' . $folderPath, $nama_gambar);
+                $file->move('assets/images/education', $nama_gambar);;
                 // Simpan nama gambar ke array
                 $imagePaths[] = $nama_gambar;
             }
             // Menambahkan array gambar ke validatedData untuk disimpan di database atau proses lainnya
             $validatedData['gambar'] = json_encode($imagePaths);
 
-            // Proses untuk file thumbnail
-            if ($request->hasFile('thumbnail')) {
-                $thumbnailFile = $request->file('thumbnail');
-                $thumbnailName = $title . '-thumbnail.' . $thumbnailFile->getClientOriginalExtension();
-                $thumbnailFile->storeAs('public/' . $folderPath, $thumbnailName);
-                $validatedData['thumbnail'] = $thumbnailName;
-            }
-            $validatedData['tech'] = json_encode($request->tech);
-
             // Menyimpan data produk ke database
-            Project::create($validatedData);
+            Education::create($validatedData);
             // Commit transaksi jika semuanya berhasil
             DB::commit();
             // Redirect dengan pesan sukses
@@ -118,17 +91,18 @@ class ProjectController extends Controller
             // Cek tombol yang ditekan
             if ($request->input('action') === 'save_add') {
                 // Redirect ke halaman form tambah produk jika "Save & Add New Product" ditekan
-                return redirect('/dashboard/project/create')->with('success', 'Project berhasil disimpan! Tambahkan project baru.');
+                return redirect('/dashboard/education/create')->with('success', 'Berhasil disimpan! Tambahkan project baru.');
             } else {
                 // Redirect ke halaman index produk jika "Save" ditekan
-                return redirect('/dashboard/project')->with('success', 'Project Berhasil di Tambahkan');
+                return redirect('/dashboard/education')->with('success', 'Berhasil di Tambahkan');
             }
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollBack();
-            // Hapus file yang sudah diupload jika terjadi error
             foreach ($imagePaths as $gambar) {
-                Storage::delete('public/' . $folderPath . '/' . $gambar);
+                if (file_exists(public_path('assets/images/education/' . $gambar))) {
+                    unlink(public_path('assets/images/education/' . $gambar));
+                }
             }
             // Kembali ke halaman sebelumnya dengan pesan error
             return redirect()
@@ -140,7 +114,7 @@ class ProjectController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Project $project)
+    public function show(Education $education)
     {
         //
     }
@@ -148,12 +122,12 @@ class ProjectController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Project $project)
+    public function edit(Education $education)
     {
-        return view('dashboard.projects.edit', [
-            'title' => 'Edit project',
-            'project' => $project,
-            'category' => Category::all()
+        return view('dashboard.Education.edit', [
+            'title' => 'Edit Education',
+            'education' => $education,
+
         ]);
     }
 
@@ -162,27 +136,19 @@ class ProjectController extends Controller
      */
     public function update(Request $request,  $id)
     {
-
         // Validasi input
         $validatedData = $request->validate([
-            'title' => 'required',
-            'slug' => 'required|unique:projects,slug,' . $id,
-            'category_id' => 'required',
-            'tech' => 'nullable|array', // Pastikan  berupa array
+            'univ' => 'required',
+            'jurusan' => 'required',
+            'from' => 'required', // Pastikan  berupa array
+            'to' => 'required',
             'gambar' => 'nullable|array', // Pastikan gambar berupa array
             'gambar.*' => 'image|mimes:jpg,jpeg,png,gif|max:5048', // Validasi untuk setiap file
-            'thumbnail' => 'image|mimes:jpg,jpeg,png,gif|max:5048',
-            'desc' => 'nullable',
-            'year' => 'required',
-            'preview' => 'nullable',
-            'code' => 'nullable',
         ]);
 
-        $status = $request->has('status') ? 'Active' : 'Inactive';
-        $validatedData['status'] = $status;
-        $title = Str::slug($request->title);
+        $univ = Str::slug($request->univ);
 
-        $folderPath = public_path('assets\images\project');
+        $folderPath = public_path('assets\images\education');
         if (!File::exists($folderPath)) {
             File::makeDirectory($folderPath, 0777, true); // Membuat folder dengan izin 0777
         }
@@ -190,8 +156,8 @@ class ProjectController extends Controller
         DB::beginTransaction();
         try {
             // Ambil data produk yang akan di-update
-            $project = Project::findOrFail($id);
-            $existingImages = json_decode($project->gambar, true) ?? []; // Gambar lama
+            $education = Education::findOrFail($id);
+            $existingImages = json_decode($education->gambar, true) ?? []; // Gambar lama
 
             // Cek jika ada gambar baru
             $newImages = [];
@@ -199,7 +165,8 @@ class ProjectController extends Controller
                 // Loop untuk menyimpan setiap file gambar yang di-upload
                 foreach ($request->file('gambar') as $index => $file) {
                     // Buat nama gambar unik (misalnya tambahkan index atau timestamp agar tidak bentrok)
-                    $nama_gambar = $title . '-' . $index . '.' . $file->getClientOriginalExtension();
+                    $nama_gambar = uniqid($univ . '-') . '.' . $file->getClientOriginalExtension();
+
                     // Pindahkan file ke folder yang sudah dibuat
                     $file->move($folderPath, $nama_gambar);
                     // Simpan nama gambar ke array baru
@@ -207,35 +174,22 @@ class ProjectController extends Controller
                 }
             }
 
-            // Proses gambar yang dihapus oleh pengguna
-            $deletedImagesString = $request->input('deleted_images', ''); // Ambil string
-            $deletedImages = $deletedImagesString ? explode(',', $deletedImagesString) : []; // Pecah menjadi array
+            // Proses gambar yang dihapus oleh user
+            $deletedImages = $request->input('deleted_images') ? explode(',', $request->input('deleted_images')) : [];
             foreach ($deletedImages as $image) {
-                // Hapus file dari folder
-                if (file_exists(public_path('assets/images/project/' . $image))) {
-                    unlink(public_path('assets/images/project/' . $image));
+                $path = public_path('assets/images/education/' . $image);
+                if (file_exists($path)) {
+                    unlink($path);
                 }
-                // Hapus dari array gambar lama
                 if (($key = array_search($image, $existingImages)) !== false) {
                     unset($existingImages[$key]);
                 }
             }
-            // Gabungkan gambar lama yang tersisa dengan gambar baru
-            $allImages = array_merge($existingImages, $newImages);
+            // Gabungkan gambar lama (yang tidak dihapus) dengan yang baru
+            $allImages = array_merge(array_values($existingImages), $newImages);
             $validatedData['gambar'] = json_encode($allImages);
-
-            if ($request->has('thumbnail')) {
-                File::delete('assets/images/product/' . $project->thumbnail);
-                $thumbnailFile = $request->file('thumbnail');
-                $thumbnailName = $title . '-thumbnail.' . $thumbnailFile->getClientOriginalExtension();
-                $thumbnailFile->move($folderPath, $thumbnailName);
-                $validatedData['thumbnail'] = $thumbnailName;
-            }
-
-            $validatedData['tech'] = json_encode($request->tech);
-
             // Update data produk ke database
-            $project->update($validatedData);
+            $education->update($validatedData);
             // Commit transaksi jika semuanya berhasil
             DB::commit();
             // Redirect dengan pesan sukses
@@ -243,10 +197,10 @@ class ProjectController extends Controller
             // Cek tombol yang ditekan
             if ($request->input('action') === 'save_add') {
                 // Redirect ke halaman form tambah produk jika "Save & Add New Product" ditekan
-                return redirect('/dashboard/project/create')->with('success', 'Project berhasil disimpan! Tambahkan project baru.');
+                return redirect('/dashboard/education/create')->with('success', 'Berhasil disimpan! Tambahkan project baru.');
             } else {
                 // Redirect ke halaman index produk jika "Save" ditekan
-                return redirect('/dashboard/project')->with('success', 'Project Berhasil di Update');
+                return redirect('/dashboard/education')->with('success', 'Berhasil di Update');
             }
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
@@ -254,8 +208,8 @@ class ProjectController extends Controller
             // Hapus file yang sudah diupload jika terjadi error
             // Hapus file baru yang sudah diupload jika terjadi error
             foreach ($newImages as $gambar) {
-                if (file_exists(public_path('assets/images/project/' . $gambar))) {
-                    unlink(public_path('assets/images/project/' . $gambar));
+                if (file_exists(public_path('assets/images/education/' . $gambar))) {
+                    unlink(public_path('assets/images/education/' . $gambar));
                 }
             }
             // Kembali ke halaman sebelumnya dengan pesan error
@@ -270,9 +224,9 @@ class ProjectController extends Controller
      */
     public function destroy($id)
     {
-        $project = Project::findOrFail($id);
+        $education = Education::findOrFail($id);
         // Menangani gambar yang lebih dari satu (misalnya JSON array)
-        $gambarPaths = json_decode($project->gambar);
+        $gambarPaths = json_decode($education->gambar);
         try {
             foreach ($gambarPaths as $gambar) {
                 $imagePath = public_path('assets/images/education/' . $gambar);
@@ -280,18 +234,11 @@ class ProjectController extends Controller
                     unlink($imagePath); // Menghapus file gambar
                 }
             }
-
             // Menghapus data produk dari database
-            $project->delete();
-            return redirect('/dashboard/project')->with('success', 'Data Berhasil di Hapus');
+            $education->delete();
+            return redirect('/dashboard/education')->with('success', 'Data Berhasil di Hapus');
         } catch (\Exception $e) {
-            return redirect('/dashboard/project')->with('error', 'Gagal Menghapus Data. Silakan Coba Lagi.');
+            return redirect('/dashboard/education')->with('error', 'Gagal Menghapus Data. Silakan Coba Lagi.');
         }
-    }
-    public function checkslug(Request $request)
-    {
-        $slug = SlugService::createSlug(Project::class, 'slug', $request->title);
-
-        return response()->json(['slug' => $slug]);
     }
 }

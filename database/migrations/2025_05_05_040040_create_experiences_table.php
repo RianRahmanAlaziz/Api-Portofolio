@@ -11,8 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('contact_controllers', function (Blueprint $table) {
+        Schema::create('experiences', function (Blueprint $table) {
             $table->id();
+            $table->string('title');
+            $table->string('jabatan');
+            $table->string('pekerjaan');
+            $table->json('tech')->nullable();
+            $table->text('desc');
+            $table->string('from');
+            $table->string('to');
             $table->timestamps();
         });
     }
@@ -22,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('contact_controllers');
+        Schema::dropIfExists('experiences');
     }
 };
